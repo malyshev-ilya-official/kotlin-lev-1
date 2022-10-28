@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="increment_button_text">increment</string>
+    <string name="information_text">there will be counter</string>
+</resources>
