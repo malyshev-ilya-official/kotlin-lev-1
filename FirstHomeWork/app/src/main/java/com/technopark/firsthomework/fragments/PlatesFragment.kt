@@ -4,6 +4,7 @@ import android.app.ActivityManager
 import android.app.PendingIntent.getActivity
 import android.content.res.Configuration
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -22,12 +23,16 @@ class PlatesFragment : Fragment() {
     private lateinit var reciclerView: RecyclerView
     private val platesList = emptyList<Int>().toMutableList()
 
+    private var plateAmount: Int = 0
+
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
         val view = inflater.inflate(R.layout.plates, container, false)
+
+        plateAmount = savedInstanceState?.getInt("platesAmount") ?: 0
 
         val configuration = resources.configuration.orientation
         val colAmount = when (configuration) {
@@ -44,15 +49,39 @@ class PlatesFragment : Fragment() {
         return view
     }
 
-    fun setPlates(number: Int) {
-        information.text = number.toString()
+    override fun onStart() {
+        super.onStart()
+        this.updatePlates()
+    }
 
-        while (platesList.size < number) {
+    override fun onSaveInstanceState(outState: Bundle) {
+        super.onSaveInstanceState(outState)
+
+        outState.putInt("platesAmount", plateAmount)
+    }
+
+    fun incPlateAmount() {
+        plateAmount += 1
+        this.updatePlates()
+    }
+
+    fun decPlateAmount() {
+        plateAmount -= 1
+        if (plateAmount < 0) {
+            plateAmount = 0
+        }
+        this.updatePlates()
+    }
+
+    fun updatePlates() {
+        information.text = plateAmount.toString()
+
+        while (platesList.size < plateAmount) {
             platesList.add(platesList.size + 1)
             reciclerView.adapter?.notifyItemInserted(platesList.size - 1)
         }
 
-        while (platesList.size > number) {
+        while (platesList.size > plateAmount) {
             platesList.removeLast()
             reciclerView.adapter?.notifyItemRemoved(platesList.size)
         }
